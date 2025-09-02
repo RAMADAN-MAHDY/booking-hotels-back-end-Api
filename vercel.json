@@ -12,10 +12,5 @@
       "src": "/(.*)",
       "dest": "dist/server.js"
     }
-  ],
-  "functions": {
-    "dist/server.js": {
-      "runtime": "nodejs20.x"
-    }
-  }
+  ]
 }
