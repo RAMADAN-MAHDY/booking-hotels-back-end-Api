@@ -5,9 +5,9 @@
 
 ## Base URL
 جميع الـ Endpoints موجودة تحت:
-
-[/api/hotels](/api/hotels)
-
+```
+https://booking-hotels-back-end-api.vercel.app
+```
 
 ---
 
@@ -62,7 +62,7 @@ GET /api/hotels/64d1234567abcd890ef12345
 // Get all hotels
 async function getHotels() {
   try {
-    const res = await fetch(`${URL}/api/hotels`);
+    const res = await fetch(`/api/hotels`);
     const data = await res.json();
     console.log("Hotels:", data);
   } catch (error) {
@@ -73,7 +73,7 @@ async function getHotels() {
 // Get single hotel
 async function getHotelById(id) {
   try {
-    const res = await fetch(`${URL}/api/hotels/${id}`);
+    const res = await fetch(`/api/hotels/${id}`);
     const data = await res.json();
     console.log("Hotel:", data);
   } catch (error) {
@@ -89,7 +89,7 @@ async function getHotelById(id) {
 ```js
 import axios from "axios";
 
-const API_URL = `${URL}/api/hotels`;
+const API_URL = `/api/hotels`;
 
 // Get all hotels
 async function getHotels() {
