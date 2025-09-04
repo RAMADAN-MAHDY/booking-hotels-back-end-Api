@@ -5,7 +5,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDb from './config/connectDB.js';
-import {seedHotels} from './helper/addData.js';
+import { seedHotels } from './helper/addData.js';
 import hotelRoutes from "./routes/hotel.routes.js";
 import Auth from './routes/Authroutes.js';
 dotenv.config();
@@ -16,9 +16,9 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 
 const corsOptions = {
-    origin: ["http://localhost:5173"  , "https://booking-hotels-khaki.vercel.app"],
-  optionsSuccessStatus: 200,
-  credentials: true
+    origin: ["http://localhost:5173", "https://booking-hotels-khaki.vercel.app"],
+    optionsSuccessStatus: 200,
+    credentials: true
 };
 app.use(cors(corsOptions));
 
@@ -41,8 +41,8 @@ app.use("/api/Auth", Auth);
 
 
 app.get('/', (req: Request, res: Response) => {
-// seedHotels();    add this line to seed data hotels 
-res.json({message: 'API is running...'});
+    // seedHotels();    add this line to seed data hotels 
+    res.json({ message: 'API is running...' });
     // res.send('API is running...');
 });
 

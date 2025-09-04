@@ -6,6 +6,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDb from './config/connectDB.js';
 import hotelRoutes from "./routes/hotel.routes.js";
+import Auth from './routes/Authroutes.js';
 dotenv.config();
 const app = express();
 app.use(bodyParser.json());
@@ -19,6 +20,7 @@ app.use(cors(corsOptions));
 connectDb();
 // Routes
 app.use("/api/hotels", hotelRoutes);
+app.use("/api/Auth", Auth);
 app.get('/', (req, res) => {
     // seedHotels();    add this line to seed data hotels 
     res.json({ message: 'API is running...' });
