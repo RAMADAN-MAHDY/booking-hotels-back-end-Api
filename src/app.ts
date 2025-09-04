@@ -7,6 +7,7 @@ import dotenv from 'dotenv';
 import connectDb from './config/connectDB.js';
 import {seedHotels} from './helper/addData.js';
 import hotelRoutes from "./routes/hotel.routes.js";
+import Auth from './routes/Authroutes.js';
 dotenv.config();
 
 
@@ -25,6 +26,7 @@ app.use(cors(corsOptions));
 connectDb();
 // Routes
 app.use("/api/hotels", hotelRoutes);
+app.use("/api/Auth", Auth);
 
 
 
