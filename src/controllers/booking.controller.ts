@@ -1,29 +1,36 @@
 import { Request, Response } from "express";
 import { Booking } from "../models/booking.model.js";
 import { User } from "../models/user.model.js";
+import {verifyToken} from "../utils/jwt.js";
 
 // ✅ Create Booking
 export const createBooking = async (req: Request, res: Response) => {
     try {
       const {
         hotelId,
-        checkIn,
-        checkOut,
         rooms,
         guests,
         nights,
+        checkIn,
+        checkOut,
         paymentMethod,
         totalPrice,
-        user, // جاي من الفرونت كـ اسم او ايميل
       } = req.body;
+
   
-      // 👇 ناخد الـ userId من الكوكيز لو موجود
-      const userId = req.cookies?.userId;
+    const userEmail = verifyToken(req.cookies.accessToken).decoded.email;
+    const userId = verifyToken(req.cookies.accessToken).decoded.id;
+      // 👇 ناخد الـ userEmai
+      let user = userEmail;
+    //   console.log(user);
+      if(!user) {
+        user = "guest"
+      }
   
       const booking = await Booking.create({
         hotel: hotelId,
         user: userId || undefined,
-        guestEmail: !userId ? user : undefined, // لو مفيش userId نخزنها كـ ضيف
+        guestEmail: user ,
         checkIn,
         checkOut,
         rooms,
@@ -52,7 +59,7 @@ export const getBookings = async (_req: Request, res: Response) => {
   try {
     const bookings = await Booking.find()
       .populate("hotel", "name city price")
-      .populate("user", "name email");
+      .populate("user", "email");
 
     res.json(bookings);
   } catch (error: any) {
@@ -63,9 +70,12 @@ export const getBookings = async (_req: Request, res: Response) => {
 // ✅ Get Single Booking
 export const getBookingById = async (req: Request, res: Response) => {
   try {
-    const booking = await Booking.findById(req.params.id)
+    const {id} = req.params;
+
+
+    const booking = await Booking.findById(id)
       .populate("hotel", "name city price")
-      .populate("user", "name email");
+      .populate("user", "email");
 
     if (!booking) return res.status(404).json({ message: "Booking not found" });
 

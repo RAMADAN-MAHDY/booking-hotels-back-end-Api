@@ -415,5 +415,293 @@ async function getHotelById(id) {
   }
 }
 ```
+## دليل استخدام الحجز (Booking) في الواجهة الأمامية
 
----
+تتيح لك واجهة برمجة التطبيقات (API) الخاصة بالحجوزات إنشاء الحجوزات وعرضها وإدارتها. جميع نقاط النهاية الخاصة بالحجوزات تتطلب مصادقة (Authentication) باستثناء نقطة نهاية `createBooking` التي يمكن أن تتم بواسطة مستخدم مسجل الدخول أو كضيف.
+
+### 1. إنشاء حجز (Create Booking)
+
+لإنشاء حجز جديد، ستحتاج إلى إرسال طلب `POST` إلى نقطة نهاية إنشاء الحجز مع تفاصيل الحجز. هذه النقطة تتطلب `accessToken` في الكوكيز إذا كان المستخدم مسجل الدخول، وإلا فسيتم التعامل مع الحجز كضيف.
+
+**نقطة النهاية:** `/api/Booking`
+**النوع:** `POST`
+
+**البيانات المطلوبة في `body`:**
+```json
+{
+  "hotelId": "<ID_الفندق>",
+  "rooms": <عدد_الغرف>,
+  "guests": <عدد_الضيوف>,
+  "nights": <عدد_الليالي>,
+  "checkIn": "<تاريخ_الدخول_YYYY-MM-DD>",
+  "checkOut": "<تاريخ_الخروج_YYYY-MM-DD>",
+  "paymentMethod": "cash" | "card",
+  "totalPrice": <السعر_الإجمالي>
+}
+```
+
+**مثال باستخدام `fetch`:**
+
+```javascript
+// ... existing code ...
+
+async function createNewBooking(bookingDetails) {
+  try {
+    const response = await fetch('https://booking-hotels-back-end-api.vercel.app/api/Booking', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(bookingDetails),
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+      console.log('Booking created successfully:', data.message, data.booking);
+      // يمكنك توجيه المستخدم إلى صفحة تأكيد الحجز
+    } else {
+      console.error('Booking creation failed:', data.message);
+      // عرض رسالة خطأ للمستخدم
+    }
+  } catch (error) {
+    console.error('Error during booking creation:', error);
+  }
+}
+
+// مثال للاستخدام (كمستخدم مسجل دخول، سيتم إرسال الكوكيز تلقائيًا)
+// createNewBooking({
+//   hotelId: '64d1234567abcd890ef12345', // استبدل بمعرف فندق حقيقي
+//   rooms: 1,
+//   guests: 2,
+//   nights: 3,
+//   checkIn: '2024-08-01',
+//   checkOut: '2024-08-04',
+//   paymentMethod: 'card',
+//   totalPrice: 300
+// });
+
+// ... existing code ...
+```
+
+**مثال باستخدام `axios`:**
+
+```javascript
+// ... existing code ...
+
+import axios from 'axios';
+
+async function createNewBookingAxios(bookingDetails) {
+  try {
+    const response = await axios.post('https://booking-hotels-back-end-api.vercel.app/api/Booking', bookingDetails, {
+      withCredentials: true, // مهم لإرسال واستقبال الكوكيز (خاصة لـ accessToken)
+    });
+    console.log('Booking created successfully:', response.data.message, response.data.booking);
+    // يمكنك توجيه المستخدم إلى صفحة تأكيد الحجز
+  } catch (error) {
+    console.error('Booking creation failed:', error.response ? error.response.data.message : error.message);
+    // عرض رسالة خطأ للمستخدم
+  }
+}
+
+// مثال للاستخدام
+// createNewBookingAxios({
+//   hotelId: '64d1234567abcd890ef12345', // استبدل بمعرف فندق حقيقي
+//   rooms: 1,
+//   guests: 2,
+//   nights: 3,
+//   checkIn: '2024-08-01',
+//   checkOut: '2024-08-04',
+//   paymentMethod: 'card',
+//   totalPrice: 300
+// });
+
+// ... existing code ...
+```
+
+### 2. الحصول على جميع الحجوزات (Get All Bookings)
+
+لاسترداد قائمة بجميع الحجوزات، ستحتاج إلى إرسال طلب `GET`. هذه النقطة تتطلب مصادقة.
+
+**نقطة النهاية:** `/api/Booking`
+**النوع:** `GET`
+
+**مثال باستخدام `fetch`:**
+
+```javascript
+// ... existing code ...
+
+async function getAllBookings() {
+  try {
+    const response = await fetch('https://booking-hotels-back-end-api.vercel.app/api/Booking', {
+      method: 'GET',
+      // سيتم إرسال الكوكيز (accessToken) تلقائيًا إذا كان موجودًا
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+      console.log('All Bookings:', data);
+    } else {
+      console.error('Failed to fetch bookings:', data.message);
+    }
+  } catch (error) {
+    console.error('Error fetching bookings:', error);
+  }
+}
+
+// مثال للاستخدام
+// getAllBookings();
+
+// ... existing code ...
+```
+
+**مثال باستخدام `axios`:**
+
+```javascript
+// ... existing code ...
+
+import axios from 'axios';
+
+async function getAllBookingsAxios() {
+  try {
+    const response = await axios.get('https://booking-hotels-back-end-api.vercel.app/api/Booking', {
+      withCredentials: true, // مهم لإرسال واستقبال الكوكيز
+    });
+    console.log('All Bookings:', response.data);
+  } catch (error) {
+    console.error('Failed to fetch bookings:', error.response ? error.response.data.message : error.message);
+  }
+}
+
+// مثال للاستخدام
+// getAllBookingsAxios();
+
+// ... existing code ...
+```
+
+### 3. الحصول على حجز بواسطة المعرف (Get Booking by ID)
+
+لاسترداد تفاصيل حجز معين باستخدام معرف الحجز، ستحتاج إلى إرسال طلب `GET`. هذه النقطة تتطلب مصادقة.
+
+**نقطة النهاية:** `/api/Booking/:id`
+**النوع:** `GET`
+
+**مثال باستخدام `fetch`:**
+
+```javascript
+// ... existing code ...
+
+async function getBookingById(bookingId) {
+  try {
+    const response = await fetch(`https://booking-hotels-back-end-api.vercel.app/api/Booking/${bookingId}`, {
+      method: 'GET',
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+      console.log(`Booking ${bookingId}:`, data);
+    } else {
+      console.error(`Failed to fetch booking ${bookingId}:`, data.message);
+    }
+  } catch (error) {
+    console.error('Error fetching booking by ID:', error);
+  }
+}
+
+// مثال للاستخدام
+// getBookingById('60c72b2f9b1e8b001c8e4d1a'); // استبدل بمعرف حجز حقيقي
+
+// ... existing code ...
+```
+
+**مثال باستخدام `axios`:**
+
+```javascript
+// ... existing code ...
+
+import axios from 'axios';
+
+async function getBookingByIdAxios(bookingId) {
+  try {
+    const response = await axios.get(`https://booking-hotels-back-end-api.vercel.app/api/Booking/${bookingId}`, {
+      withCredentials: true,
+    });
+    console.log(`Booking ${bookingId}:`, response.data);
+  } catch (error) {
+    console.error(`Failed to fetch booking ${bookingId}:`, error.response ? error.response.data.message : error.message);
+  }
+}
+
+// مثال للاستخدام
+// getBookingByIdAxios('60c72b2f9b1e8b001c8e4d1a'); // استبدل بمعرف حجز حقيقي
+
+// ... existing code ...
+```
+
+### 4. حذف حجز (Delete Booking)
+
+لحذف حجز معين باستخدام معرف الحجز، ستحتاج إلى إرسال طلب `DELETE`. هذه النقطة تتطلب مصادقة.
+
+**نقطة النهاية:** `/api/Booking/:id`
+**النوع:** `DELETE`
+
+**مثال باستخدام `fetch`:**
+
+```javascript
+// ... existing code ...
+
+async function deleteBooking(bookingId) {
+  try {
+    const response = await fetch(`https://booking-hotels-back-end-api.vercel.app/api/Booking/${bookingId}`, {
+      method: 'DELETE',
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+      console.log(`Booking ${bookingId} deleted successfully:`, data.message);
+      // يمكنك تحديث واجهة المستخدم لإزالة الحجز المحذوف
+    } else {
+      console.error(`Failed to delete booking ${bookingId}:`, data.message);
+    }
+  } catch (error) {
+    console.error('Error deleting booking:', error);
+  }
+}
+
+// مثال للاستخدام
+// deleteBooking('60c72b2f9b1e8b001c8e4d1a'); // استبدل بمعرف حجز حقيقي
+
+// ... existing code ...
+```
+
+**مثال باستخدام `axios`:**
+
+```javascript
+// ... existing code ...
+
+import axios from 'axios';
+
+async function deleteBookingAxios(bookingId) {
+  try {
+    const response = await axios.delete(`https://booking-hotels-back-end-api.vercel.app/api/Booking/${bookingId}`, {
+      withCredentials: true,
+    });
+    console.log(`Booking ${bookingId} deleted successfully:`, response.data.message);
+    // يمكنك تحديث واجهة المستخدم لإزالة الحجز المحذوف
+  } catch (error) {
+    console.error(`Failed to delete booking ${bookingId}:`, error.response ? error.response.data.message : error.message);
+  }
+}
+
+// مثال للاستخدام
+// deleteBookingAxios('60c72b2f9b1e8b001c8e4d1a'); // استبدل بمعرف حجز حقيقي
+
+// ... existing code ...
+```
+
+### ملاحظات هامة للواجهة الأمامية:
+
+*   **`withCredentials: true`:** عند استخدام `axios` أو `fetch`، تأكد من تعيين `withCredentials: true` في طلباتك إذا كنت تتعامل مع الكوكيز عبر النطاقات (cross-origin requests). هذا يضمن إرسال الكوكيز مع الطلبات واستقبالها من الاستجابات.
+*   **`CORS`:** تأكد من أن الواجهة الخلفية (backend) قد تم تكوينها بشكل صحيح للتعامل مع `CORS` (Cross-Origin Resource Sharing) للسماح لعنوان `URL` الخاص بالواجهة الأمامية بالوصول إلى `API`.
+*   **معالجة الأخطاء:** قم دائمًا بمعالجة الأخطاء بشكل مناسب في الواجهة الأمامية، مثل عرض رسائل خطأ للمستخدم أو توجيهه إلى صفحة تسجيل الدخول إذا كان التوكن غير صالح أو منتهي الصلاحية.
+*   **حالة المصادقة:** تذكر أن نقاط نهاية الحجز (باستثناء `createBooking` التي يمكن أن تتم كضيف) تتطلب مصادقة. تأكد من أن المستخدم مسجل الدخول ولديه `accessToken` صالح في الكوكيز قبل محاولة الوصول إلى هذه النقاط.
+        

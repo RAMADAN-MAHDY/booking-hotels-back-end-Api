@@ -4,8 +4,8 @@ export interface IBooking extends Document {
   hotel: Types.ObjectId;
   user?: Types.ObjectId;
   guestEmail?: string;
-  checkIn: Date;
-  checkOut: Date;
+  checkIn: string;
+  checkOut: string;
   rooms: number;
   guests: number;
   nights?: number;
@@ -18,8 +18,8 @@ const bookingSchema = new Schema<IBooking>(
     hotel: { type: Schema.Types.ObjectId, ref: "Hotel", required: true },
     user: { type: Schema.Types.ObjectId, ref: "User" },
     guestEmail: { type: String }, // fallback لو مش لاقي userId
-    checkIn: { type: Date, required: true },
-    checkOut: { type: Date, required: true },
+    checkIn: { type: String , required: true },
+    checkOut: { type: String, required: true },
     rooms: { type: Number, required: true },
     guests: { type: Number, required: true },
     nights: { type: Number },

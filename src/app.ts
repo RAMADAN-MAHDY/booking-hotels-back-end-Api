@@ -8,6 +8,7 @@ import connectDb from './config/connectDB.js';
 import { seedHotels } from './helper/addData.js';
 import hotelRoutes from "./routes/hotel.routes.js";
 import Auth from './routes/Authroutes.js';
+import  Booking  from './routes/booking.routes.js';
 dotenv.config();
 
 
@@ -27,7 +28,7 @@ connectDb();
 // Routes
 app.use("/api/hotels", hotelRoutes);
 app.use("/api/Auth", Auth);
-
+app.use("/api/Booking", Booking);
 
 
 
