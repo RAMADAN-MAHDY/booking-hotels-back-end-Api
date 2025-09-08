@@ -303,6 +303,8 @@ async function logoutUserAxios() {
 *   **`CORS`:** تأكد من أن الواجهة الخلفية (backend) قد تم تكوينها بشكل صحيح للتعامل مع `CORS` (Cross-Origin Resource Sharing) للسماح لعنوان `URL` الخاص بالواجهة الأمامية بالوصول إلى `API`.
 *   **معالجة الأخطاء:** قم دائمًا بمعالجة الأخطاء بشكل مناسب في الواجهة الأمامية، مثل عرض رسائل خطأ للمستخدم أو توجيهه إلى صفحة تسجيل الدخول إذا كان التوكن غير صالح أو منتهي الصلاحية.
 
+*   **الدفع بالبطاقة (Stripe Checkout):** عند إنشاء حجز باستخدام `paymentMethod: "card"`، ستقوم الواجهة الخلفية بإرجاع `checkoutUrl` في الاستجابة. يجب على الواجهة الأمامية توجيه المستخدم إلى هذا الرابط لإكمال عملية الدفع عبر Stripe. بعد إتمام الدفع بنجاح، سيتم إعادة توجيه المستخدم إلى `success_url` أو `cancel_url` التي تم تحديدها في الواجهة الخلفية.
+
 
 ## Base URL
 جميع الـ Endpoints موجودة تحت:
@@ -458,7 +460,12 @@ async function createNewBooking(bookingDetails) {
     const data = await response.json();
     if (response.ok) {
       console.log('Booking created successfully:', data.message, data.booking);
-      // يمكنك توجيه المستخدم إلى صفحة تأكيد الحجز
+      if (data.checkoutUrl) {
+        console.log('Redirecting to Stripe Checkout:', data.checkoutUrl);
+        window.location.href = data.checkoutUrl; // توجيه المستخدم إلى صفحة الدفع في Stripe
+      } else {
+        // يمكنك توجيه المستخدم إلى صفحة تأكيد الحجز أو عرض رسالة نجاح للدفع النقدي
+      }
     } else {
       console.error('Booking creation failed:', data.message);
       // عرض رسالة خطأ للمستخدم
@@ -496,7 +503,12 @@ async function createNewBookingAxios(bookingDetails) {
       withCredentials: true, // مهم لإرسال واستقبال الكوكيز (خاصة لـ accessToken)
     });
     console.log('Booking created successfully:', response.data.message, response.data.booking);
-    // يمكنك توجيه المستخدم إلى صفحة تأكيد الحجز
+    if (response.data.checkoutUrl) {
+      console.log('Redirecting to Stripe Checkout:', response.data.checkoutUrl);
+      window.location.href = response.data.checkoutUrl; // توجيه المستخدم إلى صفحة الدفع في Stripe
+    } else {
+      // يمكنك توجيه المستخدم إلى صفحة تأكيد الحجز أو عرض رسالة نجاح للدفع النقدي
+    }
   } catch (error) {
     console.error('Booking creation failed:', error.response ? error.response.data.message : error.message);
     // عرض رسالة خطأ للمستخدم
@@ -703,5 +715,6 @@ async function deleteBookingAxios(bookingId) {
 *   **`withCredentials: true`:** عند استخدام `axios` أو `fetch`، تأكد من تعيين `withCredentials: true` في طلباتك إذا كنت تتعامل مع الكوكيز عبر النطاقات (cross-origin requests). هذا يضمن إرسال الكوكيز مع الطلبات واستقبالها من الاستجابات.
 *   **`CORS`:** تأكد من أن الواجهة الخلفية (backend) قد تم تكوينها بشكل صحيح للتعامل مع `CORS` (Cross-Origin Resource Sharing) للسماح لعنوان `URL` الخاص بالواجهة الأمامية بالوصول إلى `API`.
 *   **معالجة الأخطاء:** قم دائمًا بمعالجة الأخطاء بشكل مناسب في الواجهة الأمامية، مثل عرض رسائل خطأ للمستخدم أو توجيهه إلى صفحة تسجيل الدخول إذا كان التوكن غير صالح أو منتهي الصلاحية.
+*   **الدفع بالبطاقة (Stripe Checkout):** عند إنشاء حجز باستخدام `paymentMethod: "card"`، ستقوم الواجهة الخلفية بإرجاع `checkoutUrl` في الاستجابة. يجب على الواجهة الأمامية توجيه المستخدم إلى هذا الرابط لإكمال عملية الدفع عبر Stripe. بعد إتمام الدفع بنجاح، سيتم إعادة توجيه المستخدم إلى `success_url` أو `cancel_url` التي تم تحديدها في الواجهة الخلفية.
 *   **حالة المصادقة:** تذكر أن نقاط نهاية الحجز (باستثناء `createBooking` التي يمكن أن تتم كضيف) تتطلب مصادقة. تأكد من أن المستخدم مسجل الدخول ولديه `accessToken` صالح في الكوكيز قبل محاولة الوصول إلى هذه النقاط.
         

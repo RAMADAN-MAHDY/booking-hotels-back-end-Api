@@ -13,11 +13,18 @@ dotenv.config();
 
 
 const app = express();
+
+// webhook route should be before bodyParser middleware
+app.use("/api/Booking/stripe", Booking);
+
+
+
+
 app.use(bodyParser.json());
 app.use(cookieParser());
 
 const corsOptions = {
-    origin: ["http://localhost:5173", "https://booking-hotels-khaki.vercel.app"],
+    origin: ["http://localhost:5173", "https://booking-hotels-khaki.vercel.app" ],
     optionsSuccessStatus: 200,
     credentials: true
 };

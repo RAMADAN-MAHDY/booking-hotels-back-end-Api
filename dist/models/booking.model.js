@@ -10,5 +10,8 @@ const bookingSchema = new Schema({
     nights: { type: Number },
     paymentMethod: { type: String, enum: ["cash", "card"], default: "cash" },
     totalPrice: { type: Number, required: true },
+    // إضافات جديدة:
+    paymentStatus: { type: String, enum: ["pending", "paid", "failed"], default: "pending" },
+    paymentIntentId: { type: String },
 }, { timestamps: true });
 export const Booking = model("Booking", bookingSchema);

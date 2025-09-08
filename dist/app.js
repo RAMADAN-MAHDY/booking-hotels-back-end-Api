@@ -10,6 +10,8 @@ import Auth from './routes/Authroutes.js';
 import Booking from './routes/booking.routes.js';
 dotenv.config();
 const app = express();
+// webhook route should be before bodyParser middleware
+app.use("/api/Booking/stripe", Booking);
 app.use(bodyParser.json());
 app.use(cookieParser());
 const corsOptions = {
