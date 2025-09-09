@@ -303,8 +303,6 @@ async function logoutUserAxios() {
 *   **`CORS`:** تأكد من أن الواجهة الخلفية (backend) قد تم تكوينها بشكل صحيح للتعامل مع `CORS` (Cross-Origin Resource Sharing) للسماح لعنوان `URL` الخاص بالواجهة الأمامية بالوصول إلى `API`.
 *   **معالجة الأخطاء:** قم دائمًا بمعالجة الأخطاء بشكل مناسب في الواجهة الأمامية، مثل عرض رسائل خطأ للمستخدم أو توجيهه إلى صفحة تسجيل الدخول إذا كان التوكن غير صالح أو منتهي الصلاحية.
 
-*   **الدفع بالبطاقة (Stripe Checkout):** عند إنشاء حجز باستخدام `paymentMethod: "card"`، ستقوم الواجهة الخلفية بإرجاع `checkoutUrl` في الاستجابة. يجب على الواجهة الأمامية توجيه المستخدم إلى هذا الرابط لإكمال عملية الدفع عبر Stripe. بعد إتمام الدفع بنجاح، سيتم إعادة توجيه المستخدم إلى `success_url` أو `cancel_url` التي تم تحديدها في الواجهة الخلفية.
-
 
 ## Base URL
 جميع الـ Endpoints موجودة تحت:
@@ -460,12 +458,7 @@ async function createNewBooking(bookingDetails) {
     const data = await response.json();
     if (response.ok) {
       console.log('Booking created successfully:', data.message, data.booking);
-      if (data.checkoutUrl) {
-        console.log('Redirecting to Stripe Checkout:', data.checkoutUrl);
-        window.location.href = data.checkoutUrl; // توجيه المستخدم إلى صفحة الدفع في Stripe
-      } else {
-        // يمكنك توجيه المستخدم إلى صفحة تأكيد الحجز أو عرض رسالة نجاح للدفع النقدي
-      }
+      // يمكنك توجيه المستخدم إلى صفحة تأكيد الحجز
     } else {
       console.error('Booking creation failed:', data.message);
       // عرض رسالة خطأ للمستخدم
@@ -503,12 +496,7 @@ async function createNewBookingAxios(bookingDetails) {
       withCredentials: true, // مهم لإرسال واستقبال الكوكيز (خاصة لـ accessToken)
     });
     console.log('Booking created successfully:', response.data.message, response.data.booking);
-    if (response.data.checkoutUrl) {
-      console.log('Redirecting to Stripe Checkout:', response.data.checkoutUrl);
-      window.location.href = response.data.checkoutUrl; // توجيه المستخدم إلى صفحة الدفع في Stripe
-    } else {
-      // يمكنك توجيه المستخدم إلى صفحة تأكيد الحجز أو عرض رسالة نجاح للدفع النقدي
-    }
+    // يمكنك توجيه المستخدم إلى صفحة تأكيد الحجز
   } catch (error) {
     console.error('Booking creation failed:', error.response ? error.response.data.message : error.message);
     // عرض رسالة خطأ للمستخدم
@@ -709,12 +697,149 @@ async function deleteBookingAxios(bookingId) {
 
 // ... existing code ...
 ```
+### 1. إرسال رسالة (Send Message)
+
+لإرسال رسالة جديدة، ستحتاج إلى إرسال طلب `POST` إلى نقطة نهاية إرسال الرسائل مع تفاصيل الرسالة. إذا كان المستخدم مسجل دخول، يمكن إرسال `accessToken` في الكوكيز لربط الرسالة بحساب المستخدم، وهذا اختياري.
+
+**نقطة النهاية:** `/api/contact`
+**النوع:** `POST`
+
+**البيانات المطلوبة في `body`:**
+```json
+{
+  "name": "<اسم_المرسل>",
+  "email": "<بريد_المرسل_الإلكتروني>",
+  "subject": "<موضوع_الرسالة>",
+  "message": "<نص_الرسالة>"
+}
+```
+
+**مثال باستخدام `fetch`:**
+
+```javascript
+async function sendMessage(messageDetails) {
+  try {
+    const response = await fetch('https://booking-hotels-back-end-api.vercel.app/api/contact', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(messageDetails),
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+      console.log('Message sent successfully:', data.message);
+      // يمكنك عرض رسالة نجاح للمستخدم
+    } else {
+      console.error('Failed to send message:', data.error);
+      // عرض رسالة خطأ للمستخدم
+    }
+  } catch (error) {
+    console.error('Error sending message:', error);
+  }
+}
+
+// مثال للاستخدام (كمستخدم مسجل دخول، سيتم إرسال الكوكيز تلقائيًا إذا كان موجودًا)
+// sendMessage({
+//   name: 'John Doe',
+//   email: 'john.doe@example.com',
+//   subject: 'Inquiry about booking',
+//   message: 'I have a question regarding my recent booking.'
+// });
+
+// مثال للاستخدام (كضيف)
+// sendMessage({
+//   name: 'Guest User',
+//   email: 'guest@example.com',
+//   subject: 'General inquiry',
+//   message: 'I am a guest and have a question.'
+// });
+```
+
+**مثال باستخدام `axios`:**
+
+```javascript
+import axios from 'axios';
+
+async function sendMessageAxios(messageDetails) {
+  try {
+    const response = await axios.post('https://booking-hotels-back-end-api.vercel.app/api/contact', messageDetails, {
+      withCredentials: true, // اختياري: لإرسال الكوكيز إذا كان المستخدم مسجل دخول
+    });
+    console.log('Message sent successfully:', response.data.message);
+    // يمكنك عرض رسالة نجاح للمستخدم
+  } catch (error) {
+    console.error('Failed to send message:', error.response ? error.response.data.error : error.message);
+    // عرض رسالة خطأ للمستخدم
+  }
+}
+
+// مثال للاستخدام
+// sendMessageAxios({
+//   name: 'Jane Smith',
+//   email: 'jane.smith@example.com',
+//   subject: 'Feedback',
+//   message: 'Great service!'
+// });
+```
+
+### 2. الحصول على جميع الرسائل (Get All Messages)
+
+لاسترداد قائمة بجميع الرسائل، ستحتاج إلى إرسال طلب `GET`. هذه النقطة تتطلب مصادقة (عادةً للمسؤولين).
+
+**نقطة النهاية:** `/api/getcontact`
+**النوع:** `GET`
+
+**مثال باستخدام `fetch`:**
+
+```javascript
+async function getAllMessages() {
+  try {
+    const response = await fetch('https://booking-hotels-back-end-api.vercel.app/api/getcontact', {
+      method: 'GET',
+      // سيتم إرسال الكوكيز إذا كان موجودًا اختياري
+    });
+
+    const data = await response.json();
+    if (response.ok) {
+      console.log('All Messages:', data);
+    } else {
+      console.error('Failed to fetch messages:', data.error);
+    }
+  } catch (error) {
+    console.error('Error fetching messages:', error);
+  }
+}
+
+// مثال للاستخدام (يتطلب مصادقة)
+// getAllMessages();
+```
+
+**مثال باستخدام `axios`:**
+
+```javascript
+import axios from 'axios';
+
+async function getAllMessagesAxios() {
+  try {
+    const response = await axios.get('https://booking-hotels-back-end-api.vercel.app/api/getcontact', {
+      withCredentials: true, // مهم لإرسال واستقبال الكوكيز للمصادقة
+    });
+    console.log('All Messages:', response.data);
+  } catch (error) {
+    console.error('Failed to fetch messages:', error.response ? error.response.data.error : error.message);
+  }
+}
+
+// مثال للاستخدام (يتطلب مصادقة)
+// getAllMessagesAxios();
+```
 
 ### ملاحظات هامة للواجهة الأمامية:
 
 *   **`withCredentials: true`:** عند استخدام `axios` أو `fetch`، تأكد من تعيين `withCredentials: true` في طلباتك إذا كنت تتعامل مع الكوكيز عبر النطاقات (cross-origin requests). هذا يضمن إرسال الكوكيز مع الطلبات واستقبالها من الاستجابات.
 *   **`CORS`:** تأكد من أن الواجهة الخلفية (backend) قد تم تكوينها بشكل صحيح للتعامل مع `CORS` (Cross-Origin Resource Sharing) للسماح لعنوان `URL` الخاص بالواجهة الأمامية بالوصول إلى `API`.
 *   **معالجة الأخطاء:** قم دائمًا بمعالجة الأخطاء بشكل مناسب في الواجهة الأمامية، مثل عرض رسائل خطأ للمستخدم أو توجيهه إلى صفحة تسجيل الدخول إذا كان التوكن غير صالح أو منتهي الصلاحية.
-*   **الدفع بالبطاقة (Stripe Checkout):** عند إنشاء حجز باستخدام `paymentMethod: "card"`، ستقوم الواجهة الخلفية بإرجاع `checkoutUrl` في الاستجابة. يجب على الواجهة الأمامية توجيه المستخدم إلى هذا الرابط لإكمال عملية الدفع عبر Stripe. بعد إتمام الدفع بنجاح، سيتم إعادة توجيه المستخدم إلى `success_url` أو `cancel_url` التي تم تحديدها في الواجهة الخلفية.
 *   **حالة المصادقة:** تذكر أن نقاط نهاية الحجز (باستثناء `createBooking` التي يمكن أن تتم كضيف) تتطلب مصادقة. تأكد من أن المستخدم مسجل الدخول ولديه `accessToken` صالح في الكوكيز قبل محاولة الوصول إلى هذه النقاط.
         

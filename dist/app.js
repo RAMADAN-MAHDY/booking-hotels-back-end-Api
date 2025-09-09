@@ -8,6 +8,7 @@ import connectDb from './config/connectDB.js';
 import hotelRoutes from "./routes/hotel.routes.js";
 import Auth from './routes/Authroutes.js';
 import Booking from './routes/booking.routes.js';
+import Message from './routes/messag.routes.js';
 dotenv.config();
 const app = express();
 // webhook route should be before bodyParser middleware
@@ -25,6 +26,7 @@ connectDb();
 app.use("/api/hotels", hotelRoutes);
 app.use("/api/Auth", Auth);
 app.use("/api/Booking", Booking);
+app.use("/api", Message);
 app.get('/', (req, res) => {
     // seedHotels();    add this line to seed data hotels 
     res.json({ message: 'API is running...' });
