@@ -25,7 +25,11 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 
 const corsOptions = {
+<<<<<<< HEAD
     origin: ["http://localhost:5173", "https://booking-hotels-khaki.vercel.app", "https://booking-hotels-1z7k.vercel.app"],
+=======
+    origin: ["http://localhost:5173","https://booking-hotels-khaki.vercel.app","https://booking-hotels-1z7k.vercel.app"],
+>>>>>>> e4f37101ca8b225f2f295bf50ad7a6733b11f0f0
     optionsSuccessStatus: 200,
     credentials: true
 };
