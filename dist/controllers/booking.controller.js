@@ -48,7 +48,7 @@ export const createBooking = async (req, res) => {
                     },
                 ],
                 mode: "payment",
-                success_url: `${process.env.CLIENT_URL}/hotel/${hotelIdStr}?session_id={CHECKOUT_SESSION_ID}`,
+                success_url: `${process.env.CLIENT_URL}?session_id={CHECKOUT_SESSION_ID}`,
                 cancel_url: `${process.env.CLIENT_URL}/cancel`,
                 metadata: { bookingId: bookingId }, // 🔗 ربط الجلسة بالحجز
             });
