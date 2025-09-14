@@ -27,7 +27,6 @@ app.use(cookieParser());
 const corsOptions = {
 
     origin: ["http://localhost:5173", "https://booking-hotels-khaki.vercel.app", "https://booking-hotels-1z7k.vercel.app"  , "https://booking-hotels-ue7g.vercel.app"],
-
     optionsSuccessStatus: 200,
     credentials: true
 };

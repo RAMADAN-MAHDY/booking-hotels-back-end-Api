@@ -32,6 +32,7 @@ export const createBooking = async (req, res) => {
             return res.status(400).json({ message: "Failed to create booking" });
         }
         const bookingId = booking._id.toString();
+        const hotelIdStr = booking.hotel.toString();
         // ✅ تجهيز الريسبونس حسب طريقة الدفع
         if (paymentMethod === "card") {
             const session = await stripe.checkout.sessions.create({
@@ -47,7 +48,7 @@ export const createBooking = async (req, res) => {
                     },
                 ],
                 mode: "payment",
-                success_url: `${process.env.CLIENT_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+                success_url: `${process.env.CLIENT_URL}/hotel/${hotelIdStr}?session_id={CHECKOUT_SESSION_ID}`,
                 cancel_url: `${process.env.CLIENT_URL}/cancel`,
                 metadata: { bookingId: bookingId }, // 🔗 ربط الجلسة بالحجز
             });

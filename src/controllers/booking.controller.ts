@@ -51,7 +51,7 @@ export const createBooking = async (req: Request, res: Response) => {
     }       
 
     const bookingId = booking._id.toString();
-
+    const hotelIdStr = booking.hotel.toString();
 
 
     // ✅ تجهيز الريسبونس حسب طريقة الدفع
@@ -69,7 +69,7 @@ export const createBooking = async (req: Request, res: Response) => {
           },
         ],
         mode: "payment",
-        success_url: `${process.env.CLIENT_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
+        success_url: `${process.env.CLIENT_URL}/hotel/${hotelIdStr}?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${process.env.CLIENT_URL}/cancel`,
         metadata: { bookingId: bookingId }, // 🔗 ربط الجلسة بالحجز
       });
