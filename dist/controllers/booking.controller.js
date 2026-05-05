@@ -32,7 +32,7 @@ export const createBooking = async (req, res) => {
             return res.status(400).json({ message: "Failed to create booking" });
         }
         const bookingId = booking._id.toString();
-        const hotelIdStr = booking.hotel.toString();
+        // const hotelIdStr = booking.hotel.toString();
         // ✅ تجهيز الريسبونس حسب طريقة الدفع
         if (paymentMethod === "card") {
             const session = await stripe.checkout.sessions.create({

@@ -5,7 +5,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDb from './config/connectDB.js';
-// import { seedHotels } from './helper/addData.js';
+import { seedHotels } from './helper/addData.js';
 import hotelRoutes from "./routes/hotel.routes.js";
 import Auth from './routes/Authroutes.js';
 import  Booking  from './routes/booking.routes.js';
@@ -25,10 +25,17 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 
 const corsOptions = {
-
-    origin: ["http://localhost:5173", "https://booking-hotels-khaki.vercel.app", "https://booking-hotels-1z7k.vercel.app"  , "https://booking-hotels-ue7g.vercel.app"],
+    origin: [
+        "http://localhost:5173", 
+        "https://booking-hotels-khaki.vercel.app", 
+        "https://booking-hotels-1z7k.vercel.app", 
+        "https://booking-hotels-ue7g.vercel.app",
+        "https://booking-hotels-back-end-api.vercel.app"
+    ],
     optionsSuccessStatus: 200,
-    credentials: true
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"]
 };
 app.use(cors(corsOptions));
 

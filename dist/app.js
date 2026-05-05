@@ -17,9 +17,17 @@ app.use("/api/Booking/stripe", Booking);
 app.use(bodyParser.json());
 app.use(cookieParser());
 const corsOptions = {
-    origin: ["http://localhost:5173", "https://booking-hotels-khaki.vercel.app", "https://booking-hotels-1z7k.vercel.app", "https://booking-hotels-ue7g.vercel.app"],
+    origin: [
+        "http://localhost:5173",
+        "https://booking-hotels-khaki.vercel.app",
+        "https://booking-hotels-1z7k.vercel.app",
+        "https://booking-hotels-ue7g.vercel.app",
+        "https://booking-hotels-back-end-api.vercel.app"
+    ],
     optionsSuccessStatus: 200,
-    credentials: true
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"]
 };
 app.use(cors(corsOptions));
 connectDb();
@@ -29,7 +37,7 @@ app.use("/api/Auth", Auth);
 app.use("/api/Booking", Booking);
 app.use("/api", Message);
 app.get('/', (req, res) => {
-    seedHotels();   //  add this line to seed data hotels 
+    seedHotels(); //  add this line to seed data hotels 
     res.json({ message: 'API is running...' });
     // res.send('API is running...');
 });

@@ -37,3 +37,6 @@ yarn-error.log*
 tmp/
 temp/
 # Temporary files and folders
+branch_structure.json
+temp_auto_push.bat
+temp_interactive_push.bat
