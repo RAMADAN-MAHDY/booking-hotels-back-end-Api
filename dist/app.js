@@ -5,7 +5,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import connectDb from './config/connectDB.js';
-// import { seedHotels } from './helper/addData.js';
+import { seedHotels } from './helper/addData.js';
 import hotelRoutes from "./routes/hotel.routes.js";
 import Auth from './routes/Authroutes.js';
 import Booking from './routes/booking.routes.js';
