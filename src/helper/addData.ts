@@ -370,10 +370,8 @@ export const seedHotels = async () => {
     await Hotel.insertMany(hotels);
 
     console.log("✅ Hotels seeded successfully (old data cleared)");
-    process.exit(0);
   } catch (error) {
     console.error("❌ Error seeding hotels:", error);
-    process.exit(1);
   }
 };
 
