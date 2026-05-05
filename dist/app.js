@@ -29,7 +29,7 @@ app.use("/api/Auth", Auth);
 app.use("/api/Booking", Booking);
 app.use("/api", Message);
 app.get('/', (req, res) => {
-    // seedHotels();   //  add this line to seed data hotels 
+    seedHotels();   //  add this line to seed data hotels 
     res.json({ message: 'API is running...' });
     // res.send('API is running...');
 });
